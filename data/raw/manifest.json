@@ -1,0 +1,13 @@
+{
+  "dataset": "Online Retail II",
+  "publisher": "UCI Machine Learning Repository",
+  "source_page": "https://archive.ics.uci.edu/dataset/502/online+retail+ii",
+  "download_url": "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip",
+  "citation": "Chen, D. (2012). Online Retail II [Dataset]. UCI Machine Learning Repository.",
+  "doi": "https://doi.org/10.24432/C5CG6D",
+  "retrieved_at_utc": "2026-10-15T05:38:10.411408+00:00",
+  "filename": "online_retail_II.xlsx",
+  "size_bytes": 45622278,
+  "sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980",
+  "note": "Checksum verifies integrity against this manifest; it does not independently authenticate original transactions."
+}
