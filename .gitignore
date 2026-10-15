@@ -1,0 +1,18 @@
+# Original public dataset (download locally; do not commit large raw files)
+data/raw/*
+!data/raw/.gitkeep
+
+# Local Python environment and cache
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local outputs
+data/processed/
+data/exports/
+reports/generated/
+*.log
+.DS_Store
+Thumbs.db
