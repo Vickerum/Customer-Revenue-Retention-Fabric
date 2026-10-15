@@ -18,9 +18,9 @@ UCI describes the data as transactions from a UK-based, registered, non-store on
 ## Download and integrity procedure
 
 1. Run `python scripts/download_data.py`.
-2. The script downloads the archive from the official UCI static download endpoint and extracts the original workbook without modifying it.
+2. The workbook in this repository was downloaded from the official UCI static download endpoint and extracted without modifying its bytes. The download script can reproduce the same acquisition locally.
 3. The script calculates SHA-256 and writes `data/raw/manifest.json` containing the source URL, retrieval timestamp, filename, file size and checksum.
-4. Keep the manifest with your local raw file. The raw workbook and manifest are excluded from Git by `.gitignore`.
+4. Keep the manifest with your local raw file. The original workbook is committed at `data/raw/online_retail_II.xlsx` for direct Fabric access. Its manifest is stored alongside it at `data/raw/manifest.json`.
 5. Run `python scripts/download_data.py --verify-only` to recalculate the hash and compare it to the locally recorded value.
 
 A checksum detects changes relative to the recorded checksum. It does not prove the source publisher's claims or transaction authenticity.
