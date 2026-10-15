@@ -1,30 +1,21 @@
-# Download the UCI dataset and store the original workbook in the Fabric Lakehouse.
+# Download the Excel dataset from GitHub into the Fabric Lakehouse.
 
 import requests
-import zipfile
 
-# Source dataset and file locations
-url = "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip"
-zip_path = "/tmp/retail.zip"  # Temporary workspace used during this run.
-excel_name = "online_retail_II.xlsx"
+url = "https://raw.githubusercontent.com/Vickerum/Customer-Revenue-Retention-Fabric/main/data/raw/online_retail_II.xlsx"
+local_file = "/tmp/online_retail_II.xlsx"
 
-# Download the ZIP archive and save its contents as a local file.
+# Download the Excel file.
 response = requests.get(url)
-data = response.content  # Raw bytes returned by the download request.
-open(zip_path, "wb").write(data)  # "wb" writes binary data.
+response.raise_for_status()
+open(local_file, "wb").write(response.content)
 
-# Extract the original Excel workbook from the archive.
-with zipfile.ZipFile(zip_path) as zip_file:
-    zip_file.extract(excel_name, "/tmp")
-
-# Create the destination folder in the attached Lakehouse, if needed.
+# Copy it into the Lakehouse.
 notebookutils.fs.mkdirs("Files/raw")
-
-# Copy the workbook from temporary storage to the Lakehouse.
 notebookutils.fs.cp(
-    "file:/tmp/" + excel_name,  # Source file in the notebook environment.
-    "Files/raw/" + excel_name,  # Destination inside the Lakehouse.
-    True                        # Overwrite an existing copy.
+    "file:" + local_file,
+    "Files/raw/online_retail_II.xlsx",
+    True
 )
 
-print("Dataset saved in the Lakehouse!")
+print("Dataset saved in Files/raw!")
