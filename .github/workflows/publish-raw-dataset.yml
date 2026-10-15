@@ -1,0 +1,84 @@
+name: Publish original UCI raw dataset
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/publish-raw-dataset.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  download-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Download and extract original workbook
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p data/raw
+          curl --fail --location --retry 3 \
+            "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip" \
+            --output /tmp/online_retail_ii.zip
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib
+          import json
+          import zipfile
+          from datetime import datetime, timezone
+
+          archive_path = Path("/tmp/online_retail_ii.zip")
+          output_path = Path("data/raw/online_retail_II.xlsx")
+          with zipfile.ZipFile(archive_path) as archive:
+              member = next(
+                  (name for name in archive.namelist()
+                   if Path(name).name.lower() == "online_retail_ii.xlsx"),
+                  None,
+              )
+              if member is None:
+                  raise SystemExit(
+                      "Expected workbook not found in archive. Members: "
+                      + repr(archive.namelist())
+                  )
+              payload = archive.read(member)
+
+          if len(payload) == 0:
+              raise SystemExit("Downloaded workbook is empty.")
+          output_path.write_bytes(payload)
+          manifest = {
+              "dataset": "Online Retail II",
+              "publisher": "UCI Machine Learning Repository",
+              "source_page": "https://archive.ics.uci.edu/dataset/502/online+retail+ii",
+              "download_url": "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip",
+              "citation": "Chen, D. (2012). Online Retail II [Dataset]. UCI Machine Learning Repository.",
+              "doi": "https://doi.org/10.24432/C5CG6D",
+              "retrieved_at_utc": datetime.now(timezone.utc).isoformat(),
+              "filename": output_path.name,
+              "size_bytes": len(payload),
+              "sha256": hashlib.sha256(payload).hexdigest(),
+              "note": "Checksum verifies integrity against this manifest; it does not independently authenticate original transactions."
+          }
+          Path("data/raw/manifest.json").write_text(
+              json.dumps(manifest, indent=2) + "\n", encoding="utf-8"
+          )
+          print(f"Workbook size: {len(payload):,} bytes")
+          print(f"SHA-256: {manifest['sha256']}")
+          PY
+
+      - name: Commit raw workbook and manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f data/raw/online_retail_II.xlsx data/raw/manifest.json
+          if git diff --cached --quiet; then
+            echo "Raw dataset already matches the repository; no commit needed."
+            exit 0
+          fi
+          git commit -m "Add original UCI Online Retail II workbook to data folder"
+          git push
