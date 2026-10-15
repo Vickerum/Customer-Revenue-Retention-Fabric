@@ -1,14 +1,27 @@
+# Step 1: Import the tools we need
 import requests
 import zipfile
 
+# Step 2: Set the file names and download link
 url = "https://archive.ics.uci.edu/static/public/502/online+retail+ii.zip"
+zip_file = "/tmp/retail.zip"
+excel_file = "online_retail_II.xlsx"
 
-open("/tmp/data.zip", "wb").write(requests.get(url).content)
+# Step 3: Download the ZIP file
+response = requests.get(url)
+with open(zip_file, "wb") as file:
+    file.write(response.content)
 
-with zipfile.ZipFile("/tmp/data.zip") as z:
-    z.extract("online_retail_II.xlsx", "/tmp")
+# Step 4: Extract the Excel file
+with zipfile.ZipFile(zip_file) as file:
+    file.extract(excel_file, "/tmp")
 
+# Step 5: Save the Excel file in the Lakehouse
 notebookutils.fs.mkdirs("Files/raw")
-notebookutils.fs.cp("file:/tmp/online_retail_II.xlsx", "Files/raw/online_retail_II.xlsx", True)
+notebookutils.fs.cp(
+    "file:/tmp/" + excel_file,
+    "Files/raw/" + excel_file,
+    True
+)
 
-print("Done!")
+print("Dataset saved!")
