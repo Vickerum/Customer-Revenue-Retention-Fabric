@@ -15,7 +15,7 @@ An end-to-end portfolio project using **real historical retail transactions** to
 - **Documented records:** 1,067,371 transaction lines
 - **Business context:** Historical transactions from a UK-based, non-store online retailer selling giftware; the source notes that many customers are wholesalers.
 
-The dataset is historical. It is suitable for demonstrating analytics methods, not for claiming that its behaviour represents the 2026 retail market. We have not independently audited the retailer's original transaction system; provenance is based on UCI's documentation.
+The source workbook has eight fields: `Invoice`, `StockCode`, `Description`, `Quantity`, `InvoiceDate`, `Price`, `Customer ID`, and `Country`. Preserve these source names in the raw layer; any renamed columns belong in documented transformation layers. See [the data dictionary](docs/data_dictionary.md).\n\nThe dataset is historical. It is suitable for demonstrating analytics methods, not for claiming that its behaviour represents the 2026 retail market. We have not independently audited the retailer's original transaction system; provenance is based on UCI's documentation.
 
 ## Get the original raw data
 
