@@ -38,30 +38,43 @@ python scripts/download_data.py --verify-only
 
 The script downloads the dataset archive from UCI, extracts the original workbook to `data/raw/online_retail_II.xlsx`, calculates its SHA-256 checksum, and writes a manifest. It does not transform the workbook. The checksum verifies file integrity relative to the recorded manifest; it does not independently prove that every transaction is authentic.
 
-## Planned architecture
+## Fabric implementation status
+
+The initial Microsoft Fabric Bronze/Silver/Gold workflow has been run in a Fabric Lakehouse named `RetailAnalyticsLakehouse`.
+
+- **Bronze:** raw retail transaction data ingested into the Lakehouse.
+- **Silver:** cleaned and typed transaction data stored as `silver_retail_transactions`.
+- **Gold:** the following analytical tables have been created and saved:
+  - `gold_customer_summary` — customer-level summary metrics.
+  - `gold_monthly_sales` — monthly sales and revenue analysis.
+  - `gold_customer_retention` — customer counts by first-purchase month and months since first purchase, with retention percentage.
+
+The retention percentage is calculated as active customers divided by the original customer count for that first-purchase month, multiplied by 100. Customer-level analysis excludes rows without a valid customer ID; those rows should remain available for overall transaction/sales analysis.
+
+**Reproducibility note:** the notebooks have been run in Fabric, but the exported `.ipynb` notebook files still need to be added to this GitHub repository. The Fabric workspace is not itself stored in GitHub.
+
+## Architecture
 
 ```text
 UCI source workbook (unchanged)
           |
           v
-Bronze — preserve source / ingestion metadata
+Bronze — raw ingestion
           |
           v
-Silver — data types, quality checks, documented cleaning
+Silver — cleaned and typed transactions
           |
           v
-Gold — customer, product, date and transaction analytical tables
+Gold — customer summary, monthly sales, customer retention
           |
           v
-Power BI semantic model — star schema + DAX measures
+Next: Power BI semantic model and report
           |
           v
-Business insights — revenue, repeat purchase, cancellations, concentration
+Evidence-backed business insights
 ```
 
-Bronze/Silver/Gold are logical data layers. Their implementation will be documented as the Fabric solution is built.
-
-## Questions to investigate (not assumed conclusions)
+## Questions to investigate
 
 - How does revenue vary over time and across countries/products?
 - How concentrated is revenue among customers?
@@ -93,16 +106,12 @@ We will discover findings from the data rather than invent results in advance. W
     └── profile_raw_data.py
 ```
 
-## Planned deliverables
+## Next deliverables
 
-- Reproducible raw-data acquisition and provenance
-- Data profiling and quality issue log
-- Microsoft Fabric ingestion and Bronze/Silver/Gold processing
-- SQL transformations and documented data-quality rules
-- Star-schema semantic model
-- Advanced DAX: time intelligence, customer ranking, repeat purchase/cohorts and cancellation analysis
-- Power BI report with executive summary and drill-through
-- Evidence-backed recommendations with assumptions and limitations clearly stated
+- Export and commit the Fabric notebooks (`01_Load_Raw_Retail_Data`, `02_Silver_Clean_Retail_Data`, and `03_Gold_Customer_Analysis`) as `.ipynb` files.
+- Validate row counts, key uniqueness, null handling and retention percentages in the Gold tables.
+- Build the Power BI semantic model and report.
+- Add evidence-backed findings and recommendations, with assumptions and limitations clearly stated.
 
 ## Attribution
 
